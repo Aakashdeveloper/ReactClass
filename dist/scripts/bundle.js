@@ -48813,6 +48813,29 @@ module.exports= About;
 
 },{"react":197}],201:[function(require,module,exports){
 var React = require('react');
+var Header = require('./common/header');
+var RouteHandler = require('react-router').RouteHandler;
+$ = jquery = require('jquery')
+
+
+var App = React.createClass({displayName: "App",
+	render: function(){
+		return (
+				React.createElement("div", null, 
+					React.createElement(Header, null), 
+					React.createElement("div", {className: "continer-fluid"}, 
+						React.createElement(RouteHandler, null)
+					)
+				)
+			)
+	}
+})
+
+
+module.exports = App;
+
+},{"./common/header":203,"jquery":2,"react":197,"react-router":28}],202:[function(require,module,exports){
+var React = require('react');
 var AuthorApi = require('../../api/authorApi');
 
 var Authors = React.createClass({displayName: "Authors",
@@ -48857,21 +48880,24 @@ var Authors = React.createClass({displayName: "Authors",
 
 module.exports= Authors;
 
-},{"../../api/authorApi":198,"react":197}],202:[function(require,module,exports){
+},{"../../api/authorApi":198,"react":197}],203:[function(require,module,exports){
 var React = require('react');
+var Router = require('react-router');
+var Link = Router.Link;
+
 var Header = React.createClass({displayName: "Header",
 	render:function(){
 		return(
 			 React.createElement("nav", {className: "navbar navbar-default"}, 
 			 	React.createElement("div", {className: "container-fluid"}, 
-			 		React.createElement("a", {href: "/", className: "navbar-brand"}, 
+			 		React.createElement(Link, {to: "app", className: "navbar-brand"}, 
 			 			React.createElement("img", {src: "images/react.png"})
 			 		), 
 			 		React.createElement("ul", {className: "nav navbar-nav"}, 
 
-			 		   React.createElement("li", null, React.createElement("a", {href: "/#about"}, "About")), 
-			 		   React.createElement("li", null, React.createElement("a", {href: "/#authors"}, "Author")), 
-			 			React.createElement("li", null, React.createElement("a", {href: "/"}, "Home"))
+			 		   React.createElement("li", null, React.createElement(Link, {to: "app"}, "Home")), 
+			 		   React.createElement("li", null, React.createElement(Link, {to: "authors"}, "Author")), 
+			 			React.createElement("li", null, React.createElement(Link, {to: "about"}, "About"))
 			 			
 			 		)
 			 	)
@@ -48881,7 +48907,7 @@ var Header = React.createClass({displayName: "Header",
 });
 
 module.exports = Header;
-},{"react":197}],203:[function(require,module,exports){
+},{"react":197,"react-router":28}],204:[function(require,module,exports){
 var React = require('react');
 var Router = require('react-router');
 var Link = Router.Link;
@@ -48891,51 +48917,68 @@ var Home = React.createClass({displayName: "Home",
 		return (
 			React.createElement("div", {className: "jumbotron"}, 
 				React.createElement("h1", null, "We am learning React Js"), 
-				React.createElement("p", null, "You gus are awsm")
+				React.createElement("p", null, "You gus are awsm"), 
+				React.createElement(Link, {to: "about", className: "btn btn-primary btn-lg"}, "Learn More")
 			)
 		)
 	}
 });
 
 module.exports = Home;
-},{"react":197,"react-router":28}],204:[function(require,module,exports){
-$ = jQuery = require('jquery');
-
+},{"react":197,"react-router":28}],205:[function(require,module,exports){
 var React = require('react');
-var Home = require('./components/homePage');
-var About = require('./components/about/aboutPage');
-var Authors = require('./components/authors/authorPage')
-var Header = require('./components/common/header');
+var Link = require('react-router').Link;
 
-var App = React.createClass({displayName: "App",
-	  render:function(){
-	  	var Child;
+var NotFoundPage= React.createClass({displayName: "NotFoundPage",
+	render:function(){
+		return (
+				React.createElement("div", {className: "container"}, 
+					React.createElement("h1", null, "Page Not Found "), 
+					React.createElement("p", null, "Soory  there is nothing"), 
+					React.createElement("p", null, React.createElement(Link, {to: "app"}, "Back to  Home"))
 
-	  	switch(this.props.route){
-	  		case 'about': Child= About ; break;
-	  		case 'authors': Child= Authors ; break;
-	  		default: Child =Home;
+				)
 
-	  	}
-
-	  	return(
-	  		React.createElement("div", null, 
-	  			React.createElement(Header, null), 
-	  			React.createElement(Child, null)
-	  		)
-	  		)
-	  }
-
+			)
+	}
 });
 
-function render(){
-	var route =  window.location.hash.substr(1);
-	React.render(React.createElement(App, {route: route}),document.getElementById('app'))
+module.exports= NotFoundPage;
 
-}
+},{"react":197,"react-router":28}],206:[function(require,module,exports){
+$ = jQuery = require('jquery');
+var React = require('react');
+var Router = require('react-router');
+var routes = require('./routes')
 
-window.addEventListener('hashchange',render);
+Router.run(routes, function(Handler){
+	React.render(React.createElement(Handler, null), document.getElementById('app'))
+})
 
-render()
+},{"./routes":207,"jquery":2,"react":197,"react-router":28}],207:[function(require,module,exports){
+'use strict'
 
-},{"./components/about/aboutPage":200,"./components/authors/authorPage":201,"./components/common/header":202,"./components/homePage":203,"jquery":2,"react":197}]},{},[204]);
+var React = require('react');
+
+var Router = require('react-router');
+var DefaultRoute = Router.DefaultRoute;
+var Route= Router.Route;
+var NotFoundRoute = Router.NotFoundRoute;
+var Redirect = Router.Redirect;
+
+var routes =(
+	React.createElement(Route, {name: "app", path: "/", handler: require('./components/app')}, 
+		React.createElement(DefaultRoute, {handler: require('./components/homePage')}), 
+		React.createElement(Route, {name: "authors", handler: require('./components/authors/authorPage')}), 
+		React.createElement(Route, {name: "about", handler: require('./components/about/aboutPage')}), 
+		React.createElement(NotFoundRoute, {handler: require('./components/notFoundPage')}), 
+		React.createElement(Redirect, {from: "about-us", to: "about"}), 
+		React.createElement(Redirect, {from: "awthurs", to: "authors"}), 
+		React.createElement(Redirect, {from: "about/*", to: "about"})
+
+	)
+)
+
+module.exports = routes;
+
+},{"./components/about/aboutPage":200,"./components/app":201,"./components/authors/authorPage":202,"./components/homePage":204,"./components/notFoundPage":205,"react":197,"react-router":28}]},{},[206]);
