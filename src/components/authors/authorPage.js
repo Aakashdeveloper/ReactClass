@@ -1,44 +1,41 @@
+"use strict"
 var React = require('react');
-var AuthorApi = require('../../api/authorApi');
+var Router = require('react-router');
+var Link = Router.Link;
+var AuthorActions = require('../../actions/authorActions');
+var AuthorStore = require('../../stores/authorStore');
+var AuthorList = require('./authorlist');
 
-var Authors = React.createClass({
-	getInitialState :function(){
-			return{
-				authors:[]
-			}
-	},
+ var Authors = React.createClass({
+ 	getInitialState: function(){
+ 		return {
+ 			authors:AuthorStore.getAllAuthors()
 
- 	componentWillMount: function(){
- 		this.setState({authors:AuthorApi.getAllAuthors()})
+ 		};
  	},
 
-	render:function(){
-		var createAuthorRow = function(author){
-			return (
-					<tr key={author.id}>
-						<td><a href={"/#authors/" +author.id}>{author.id}</a></td>
-						<td>{author.firstName}</td>
-					</tr>
-				)
-		};
+ 	componentWillMount: function(){
+ 		AuthorStore.addChangeListener(this._onChange);
+    },
 
-		return(
-			<div>
-				<h1>Author</h1>
-			
-				<table className="table">
-					<thead>
-						<th>ID</th>
-						<th>Name</th>
-					</thead>
-					<tbody>
-						{this.state.authors.map(createAuthorRow, this)}
-					</tbody>
-				</table>
-			</div>
-			)
-	}
-});
-
-
-module.exports= Authors;
+    componentWillUnmount: function(){
+ 		AuthorStore.removeChangeListener(this._onChange);
+    },
+    
+    _onChange: function(){
+    	this.setState({authors: AuthorStore.getAllAuthors()});
+    },
+    
+	 render: function(){
+	 	
+		 return (
+		 		<div>
+		 		<Link to="addAuthor" className="btn btn-default">Add author </Link>
+		 		 <AuthorList authors={this.state.authors} />
+		 		</div>
+		 	);
+	 }
+ });
+ 
+ module.exports = Authors;
+ 
